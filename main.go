@@ -53,14 +53,14 @@ type Config struct {
 func (c *Config) SlashHandler(w http.ResponseWriter, r *http.Request) {
 	err := c.verifySigningSecret(r)
 	if err != nil {
-		log.Printf("Error verifying signing secret: %w", err)
+		log.Printf("Error verifying signing secret: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	s, err := slack.SlashCommandParse(r)
 	if err != nil {
-		log.Printf("Error parsing slash command: %w", err)
+		log.Printf("Error parsing slash command: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -70,7 +70,7 @@ func (c *Config) SlashHandler(w http.ResponseWriter, r *http.Request) {
 		modalRequest := generateModalRequest()
 		_, err = c.Client.OpenView(s.TriggerID, modalRequest)
 		if err != nil {
-			log.Printf("Error opening view: %w", err)
+			log.Printf("Error opening view: %v", err)
 		}
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
@@ -124,7 +124,7 @@ func makeTextInputBlock(title, placeholder, returnName, blockName string) *slack
 func (c *Config) ModalHandler(w http.ResponseWriter, r *http.Request) {
 	err := c.verifySigningSecret(r)
 	if err != nil {
-		log.Printf("Error from verifySigningSecret: %w", err)
+		log.Printf("Error from verifySigningSecret: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -132,7 +132,7 @@ func (c *Config) ModalHandler(w http.ResponseWriter, r *http.Request) {
 	var i slack.InteractionCallback
 	err = json.Unmarshal([]byte(r.FormValue("payload")), &i)
 	if err != nil {
-		log.Printf("JSON Unmarshal error: %w", err)
+		log.Printf("JSON Unmarshal error: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -156,7 +156,7 @@ func (c *Config) ModalHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := c.updateMessage(channel, messageTimestamp, slack.MsgOptionBlocks(newMessageBlocks.BlockSet...)); err != nil {
-			log.Printf("API update message error: %w", err)
+			log.Printf("API update message error: %v", err)
 			w.WriteHeader(http.StatusUnauthorized)
 		}
 		return
@@ -187,7 +187,7 @@ func (c *Config) ModalHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := c.sendMessage(channel, slack.MsgOptionBlocks(headerBlock, actionBlock, sectionBlock)); err != nil {
-			log.Printf("API post message error: %w", err)
+			log.Printf("API post message error: %v", err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
